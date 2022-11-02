@@ -1,5 +1,5 @@
 BRANCH="master"
-INSTALL_NATIVE="gcc-10.3.2-2022.09-aarch64-linux"
+INSTALL_NATIVE="gcc-10.3.1-2022.09-aarch64-linux"
 COMPILER_INFO="gcc for openEuler 2.3.2"
 
 GCC="gcc-10.3.0"
