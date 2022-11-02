@@ -18,6 +18,7 @@ readonly JEMALLOC_NAME="jemalloc"
 readonly AUTOFDO_NAME="autofdo"
 readonly BOLT_NAME="llvm-bolt"
 readonly CMAKE_NAME="cmake"
+readonly OPENSSL_NAME="openssl"
 
 # Create the open source software directory.
 [ ! -d "$OPEN_SOURCE_PATH" ] && mkdir $OPEN_SOURCE_PATH
@@ -41,6 +42,7 @@ download $JEMALLOC_NAME
 download $AUTOFDO_NAME
 download $BOLT_NAME
 download $CMAKE_NAME
+download $OPENSSL_NAME
 
 popd
 echo "Download success!!!"
