@@ -16,6 +16,7 @@ readonly ROOT_NATIVE_DIR="$PWD/arm64le_build_dir"
 readonly ROOT_NATIVE_SRC="$PWD/../../open_source/hcc_arm64le_native_build_src"
 readonly PREFIX_NATIVE="$PWD/arm64le_build_dir/$INSTALL_NATIVE"
 readonly PREFIX_BOLT="$PWD/arm64le_build_dir/llvm-bolt"
+readonly PREFIX_OPENSSL="$PWD/arm64le_build_dir/openssl"
 readonly OUTPUT="$PWD/../../output/$INSTALL_NATIVE"
 readonly PARALLEL=$(grep ^processor /proc/cpuinfo|wc -l)
 readonly HOST="aarch64-linux-gnu"
@@ -32,7 +33,7 @@ create_directory() {
     [ -n "$1" ] && rm -rf $1; mkdir -p $1; shift; done
 }
 
-create_directory $ROOT_NATIVE_DIR/obj $PREFIX_NATIVE $PREFIX_BOLT $OUTPUT $ROOT_NATIVE_DIR/obj/build-gmp $ROOT_NATIVE_DIR/obj/build-mpfr $ROOT_NATIVE_DIR/obj/build-isl $ROOT_NATIVE_DIR/obj/build-mpc $ROOT_NATIVE_DIR/obj/build-binutils $ROOT_NATIVE_DIR/obj/build-gcc-final $ROOT_NATIVE_DIR/obj/build-mathlib $ROOT_NATIVE_DIR/obj/build-jemalloc $ROOT_NATIVE_DIR/obj/build-autofdo $ROOT_NATIVE_DIR/obj/build-llvm-bolt $ROOT_NATIVE_DIR/obj/build-cmake
+create_directory $ROOT_NATIVE_DIR/obj $PREFIX_NATIVE $PREFIX_BOLT $PREFIX_OPENSSL $OUTPUT $ROOT_NATIVE_DIR/obj/build-gmp $ROOT_NATIVE_DIR/obj/build-mpfr $ROOT_NATIVE_DIR/obj/build-isl $ROOT_NATIVE_DIR/obj/build-mpc $ROOT_NATIVE_DIR/obj/build-binutils $ROOT_NATIVE_DIR/obj/build-gcc-final $ROOT_NATIVE_DIR/obj/build-mathlib $ROOT_NATIVE_DIR/obj/build-jemalloc $ROOT_NATIVE_DIR/obj/build-autofdo $ROOT_NATIVE_DIR/obj/build-llvm-bolt $ROOT_NATIVE_DIR/obj/build-cmake $ROOT_NATIVE_DIR/obj/build-openssl
 
 # Change libstdc++.so option.
 sed -i "s#^\\t\$(OPT_LDFLAGS).*#\\t\$(OPT_LDFLAGS) \$(SECTION_LDFLAGS) \$(AM_CXXFLAGS) \$(LTLDFLAGS) -Wl,-z,relro,-z,now,-z,noexecstack -Wtrampolines -o \$\@#g" $ROOT_NATIVE_SRC/$GCC/libstdc++-v3/src/Makefile.in
@@ -56,6 +57,17 @@ make -j $PARALLEL && make install && popd
 echo "Building binutils..." && pushd $ROOT_NATIVE_DIR/obj/build-binutils
 LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" CFLAGS_FOR_TARGET="${SECURE_CFLAGS}" CXXFLAGS_FOR_TARGET="${SECURE_CFLAGS}" $ROOT_NATIVE_SRC/$BINUTILS/configure --prefix=$PREFIX_NATIVE --with-pkgversion="${COMPILER_INFO}" --enable-plugins --enable-ld=yes --libdir=$PREFIX_NATIVE/lib64 --enable-multiarch --build=$BUILD --host=$HOST --target=$TARGET
 make -j $PARALLEL && make install prefix=$PREFIX_NATIVE exec_prefix=$PREFIX_NATIVE libdir=$PREFIX_NATIVE/lib64 && popd
+
+# Temporarily install OpenSSL to provide fixed libcrypto.so version for various OSes.
+echo "Building openssl for autofdo..." && pushd $ROOT_NATIVE_DIR/obj/build-openssl
+cp -rf $ROOT_NATIVE_SRC/$OPENSSL/* . && ./config --prefix=$PREFIX_OPENSSL
+make -j $PARALLEL && make install && popd
+export OPENSSL_ROOT_DIR=$PREFIX_OPENSSL
+export PATH=$PREFIX_OPENSSL/bin:$PATH
+export CPLUS_INCLUDE_PATH=$PREFIX_OPENSSL/include
+export LIBRARY_PATH=$PREFIX_OPENSSL/lib
+export LD_LIBRARY_PATH=$PREFIX_OPENSSL/lib
+cp $PREFIX_OPENSSL/lib/libcrypto.so.1.1 $PREFIX_NATIVE/lib64
 
 echo "Building autofdo..." && pushd $ROOT_NATIVE_DIR/obj/build-autofdo
 cp -rf $ROOT_NATIVE_SRC/$AUTOFDO/* . && libtoolize && aclocal -I . && autoheader && autoconf && automake --add-missing -c

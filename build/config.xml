@@ -1,6 +1,6 @@
 BRANCH="master"
-INSTALL_NATIVE="gcc-10.3.1-2022.09-aarch64-linux"
-COMPILER_INFO="gcc for openEuler 2.3.1"
+INSTALL_NATIVE="gcc-10.3.2-2022.09-aarch64-linux"
+COMPILER_INFO="gcc for openEuler 2.3.2"
 
 GCC="gcc-10.3.0"
 BINUTILS="binutils-2.37"
@@ -14,3 +14,4 @@ MPFR="mpfr-4.1.0"
 AUTOFDO="autofdo-0.19"
 BOLT="llvm-bolt-0"
 CMAKE="cmake-3.22.0"
+OPENSSL="openssl-1.1.1m"

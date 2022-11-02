@@ -36,6 +36,7 @@ tar -xzf $ROOT_BUILD_DIR/open_source/optimized-routines/$MATHLIB.tar.gz -C $ROOT
 tar -xf $ROOT_BUILD_DIR/open_source/autofdo/$AUTOFDO.tar.xz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/llvm-bolt/$BOLT.tar.xz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/cmake/$CMAKE.tar.gz -C $ROOT_NATIVE_SRC
+tar -xzf $ROOT_BUILD_DIR/open_source/openssl/$OPENSSL.tar.gz -C $ROOT_NATIVE_SRC
 
 apply_patch() {
     if [ $1 = "isl" ]; then
@@ -61,5 +62,6 @@ apply_patch optimized-routines $MATHLIB
 apply_patch autofdo $AUTOFDO
 apply_patch llvm-bolt $BOLT
 apply_patch cmake $CMAKE
+apply_patch openssl $OPENSSL
 
 chmod 777 $ROOT_NATIVE_SRC -R
