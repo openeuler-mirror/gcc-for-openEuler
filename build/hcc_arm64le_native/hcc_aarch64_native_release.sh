@@ -60,7 +60,12 @@ make -j $PARALLEL && make install prefix=$PREFIX_NATIVE exec_prefix=$PREFIX_NATI
 
 # Temporarily install OpenSSL to provide fixed libcrypto.so version for various OSes.
 echo "Building openssl for autofdo..." && pushd $ROOT_NATIVE_DIR/obj/build-openssl
-cp -rf $ROOT_NATIVE_SRC/$OPENSSL/* . && ./config --prefix=$PREFIX_OPENSSL
+cp -rf $ROOT_NATIVE_SRC/$OPENSSL/* .
+LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" \
+./Configure --prefix=$PREFIX_OPENSSL --openssldir=$PREFIX_OPENSSL enable-ec_nistp_64_gcc_128 zlib enable-camellia \
+    enable-seed enable-rfc3779 enable-sctp enable-cms enable-md2 enable-rc5 enable-ssl3 enable-ssl3-method \
+    enable-weak-ssl-ciphers no-mdc2 no-ec2m enable-sm2 enable-sm3 enable-sm4 enable-tlcp shared linux-aarch64 \
+    -Wa,--noexecstack -DPURIFY '-DDEVRANDOM="\"/dev/urandom\""'
 make -j $PARALLEL && make install && popd
 export OPENSSL_ROOT_DIR=$PREFIX_OPENSSL
 export PATH=$PREFIX_OPENSSL/bin:$PATH
