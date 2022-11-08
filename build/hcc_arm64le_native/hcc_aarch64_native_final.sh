@@ -18,6 +18,7 @@ readonly PREFIX_NATIVE="$PWD/arm64le_build_dir/$INSTALL_NATIVE"
 readonly OUTPUT="$PWD/../../output/$INSTALL_NATIVE"
 readonly PARALLEL=$(grep ^processor /proc/cpuinfo|wc -l)
 
+declare -x SECURE_CFLAGS="-O2 -fPIC -Wall -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wl,-z,relro,-z,now,-z,noexecstack -Wtrampolines -mlittle-endian -march=armv8-a"
 declare -x PATH=$PREFIX_NATIVE/bin:$PATH
 declare -x CFLAGS_FOR_MATHLIB="-frounding-math -fexcess-precision=standard $SECURE_CFLAGS"
 declare -x CFLAGS_FOR_JEMALLOC="$SECURE_CFLAGS"
@@ -59,6 +60,9 @@ make -j $PARALLEL && make install && popd
 
 for file in $(find "$PREFIX_NATIVE" -name "lib*.so*.*[0-9]"); do
     chrpath --delete $file; done
+
+for file in $(find "$PREFIX_NATIVE" -name "*.la"); do
+    [ -e "$file" ] && rm -f $file; done
 
 echo "end of dir chrpath trim"
 
