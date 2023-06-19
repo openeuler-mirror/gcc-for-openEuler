@@ -19,7 +19,7 @@ source pre_construction.sh 2>&1 | tee $LOG_PATH/hcc_arm64le_native_patch.log
 
 echo "#-----------------------------------------------"
 echo "Now building the hcc_arm64le_native toolchain ..."
-echo "The entire build process takes about 45 minutes (build time is related to machine performance), you can view the detailed build log in the ${LOG_PATH} file"
+echo "The entire build process takes about 45 minutes (build time is related to machine performance), you can view the detailed build log in the ${LOG_PATH} file."
 source hcc_update_sourcecode.sh 2>&1 | tee -a $LOG_PATH/hcc_arm64le_native_patch.log
 source hcc_aarch64_native_release.sh 2>&1 | tee $LOG_PATH/hcc_arm64le_native_build.log
 source hcc_aarch64_native_final.sh 2>&1 | tee $LOG_PATH/hcc_arm64le_native_final.log

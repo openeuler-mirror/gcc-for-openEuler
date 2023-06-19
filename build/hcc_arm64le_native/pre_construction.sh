@@ -44,9 +44,8 @@ apply_patch() {
     else
         cd $ROOT_NATIVE_SRC/$2
     fi
-    for file in $(grep -ne ^Patch[0-9]*:.*\.patch $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}')
-    do
-        patch --fuzz=0 -p1 < $ROOT_BUILD_DIR/open_source/$1/$file
+    for file in $(grep -ne ^Patch[0-9]*:.*\.patch $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
+        patch --fuzz=0 -p1 <$ROOT_BUILD_DIR/open_source/$1/$file
     done
     cd -
 }
