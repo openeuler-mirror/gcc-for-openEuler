@@ -18,7 +18,7 @@ readonly PREFIX_NATIVE="$PWD/arm64le_build_dir/$INSTALL_NATIVE"
 readonly PREFIX_BOLT="$PWD/arm64le_build_dir/llvm-bolt"
 readonly PREFIX_OPENSSL="$PWD/arm64le_build_dir/openssl"
 readonly OUTPUT="$PWD/../../output/$INSTALL_NATIVE"
-readonly PARALLEL=$(grep ^processor /proc/cpuinfo|wc -l)
+readonly PARALLEL=$(grep ^processor /proc/cpuinfo | wc -l)
 readonly HOST="aarch64-linux-gnu"
 readonly BUILD=$HOST
 readonly TARGET=$HOST
@@ -30,7 +30,10 @@ declare -x FCFLAGS="$SECURE_CFLAGS"
 # Create an empty directory.
 create_directory() {
     while [ $# != 0 ]; do
-    [ -n "$1" ] && rm -rf $1; mkdir -p $1; shift; done
+        [ -n "$1" ] && rm -rf $1
+        mkdir -p $1
+        shift
+    done
 }
 
 create_directory $ROOT_NATIVE_DIR/obj $PREFIX_NATIVE $PREFIX_BOLT $PREFIX_OPENSSL $OUTPUT $ROOT_NATIVE_DIR/obj/build-gmp $ROOT_NATIVE_DIR/obj/build-mpfr $ROOT_NATIVE_DIR/obj/build-isl $ROOT_NATIVE_DIR/obj/build-mpc $ROOT_NATIVE_DIR/obj/build-binutils $ROOT_NATIVE_DIR/obj/build-gcc-final $ROOT_NATIVE_DIR/obj/build-mathlib $ROOT_NATIVE_DIR/obj/build-jemalloc $ROOT_NATIVE_DIR/obj/build-autofdo $ROOT_NATIVE_DIR/obj/build-llvm-bolt $ROOT_NATIVE_DIR/obj/build-cmake $ROOT_NATIVE_DIR/obj/build-openssl
@@ -61,11 +64,7 @@ make -j $PARALLEL && make install prefix=$PREFIX_NATIVE exec_prefix=$PREFIX_NATI
 # Temporarily install OpenSSL to provide fixed libcrypto.so version for various OSes.
 echo "Building openssl for autofdo..." && pushd $ROOT_NATIVE_DIR/obj/build-openssl
 cp -rf $ROOT_NATIVE_SRC/$OPENSSL/* .
-LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" \
-./Configure --prefix=$PREFIX_OPENSSL --openssldir=$PREFIX_OPENSSL enable-ec_nistp_64_gcc_128 zlib enable-camellia \
-    enable-seed enable-rfc3779 enable-sctp enable-cms enable-md2 enable-rc5 enable-ssl3 enable-ssl3-method \
-    enable-weak-ssl-ciphers no-mdc2 no-ec2m enable-sm2 enable-sm3 enable-sm4 enable-tlcp shared linux-aarch64 \
-    -Wa,--noexecstack -DPURIFY '-DDEVRANDOM="\"/dev/urandom\""'
+LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" ./Configure --prefix=$PREFIX_OPENSSL --openssldir=$PREFIX_OPENSSL enable-ec_nistp_64_gcc_128 zlib enable-camellia enable-seed enable-rfc3779 enable-sctp enable-cms enable-md2 enable-rc5 enable-ssl3 enable-ssl3-method enable-weak-ssl-ciphers no-mdc2 no-ec2m enable-sm2 enable-sm3 enable-sm4 enable-tlcp shared linux-aarch64 -Wa,--noexecstack -DPURIFY '-DDEVRANDOM="\"/dev/urandom\""'
 make -j $PARALLEL && make install && popd
 export OPENSSL_ROOT_DIR=$PREFIX_OPENSSL
 export PATH=$PREFIX_OPENSSL/bin:$PATH

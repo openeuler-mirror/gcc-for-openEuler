@@ -25,7 +25,7 @@ readonly OPENSSL_NAME="openssl"
 
 download() {
     [ -d "$1" ] && rm -rf $1
-    echo "Download $1" && git clone -b $BRANCH https://gitee.com/src-openeuler/$1.git
+    echo "Download $1." && git clone -b $BRANCH https://gitee.com/src-openeuler/$1.git
 }
 
 # Download packages.
