@@ -1,6 +1,6 @@
 #!/bin/bash
 # The entrance to build the compiler toolchain.
-# Copyright (c) Huawei Technologies Co., Ltd. 2022-2022. All rights reserved.
+# Copyright (c) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
 
 set -e
 
@@ -51,7 +51,6 @@ fi
 
 echo "$(date +"%Y-%m-%d %H:%M:%S") ======== begin building ========"
 source ../config.xml
-source /opt/rh/devtoolset-7/enable
 miss_tool_error gcc -v
 miss_tool_error g++ -v
 miss_tool_error bison --version
