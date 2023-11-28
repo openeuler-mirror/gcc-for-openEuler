@@ -1,6 +1,6 @@
 #!/bin/bash
 # Download all the required packages.
-# Copyright (c) Huawei Technologies Co., Ltd. 2022-2022. All rights reserved.
+# Copyright (c) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
 
 set -e
 
@@ -19,6 +19,15 @@ readonly AUTOFDO_NAME="autofdo"
 readonly BOLT_NAME="llvm-bolt"
 readonly CMAKE_NAME="cmake"
 readonly OPENSSL_NAME="openssl"
+readonly NCURSES_NAME="ncurses"
+readonly MLIR_NAME="llvm-mlir"
+readonly PROTOBUF_NAME="protobuf"
+readonly PIN_GCC_CLIENT_NAME="pin-gcc-client"
+readonly GRPC_NAME="grpc"
+readonly CARES_NAME="c-ares"
+readonly ABSEIL_NAME="abseil-cpp"
+readonly RE2_NAME="re2"
+readonly JSONCPP_NAME="jsoncpp"
 
 # Create the open source software directory.
 [ ! -d "$OPEN_SOURCE_PATH" ] && mkdir $OPEN_SOURCE_PATH
@@ -43,6 +52,15 @@ download $AUTOFDO_NAME
 download $BOLT_NAME
 download $CMAKE_NAME
 download $OPENSSL_NAME
+download $NCURSES_NAME
+download $MLIR_NAME
+download $PROTOBUF_NAME
+download $PIN_GCC_CLIENT_NAME
+download $GRPC_NAME
+download $CARES_NAME
+download $ABSEIL_NAME
+download $RE2_NAME
+download $JSONCPP_NAME
 
 popd
 echo "Download success!!!"

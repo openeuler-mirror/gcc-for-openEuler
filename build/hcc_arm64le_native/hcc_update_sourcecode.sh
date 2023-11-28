@@ -3,7 +3,7 @@
 # to fix random difference in binutils and gcc. And
 # avoid repeatedly generate the document files and
 # makefile* files.
-# Copyright (c) Huawei Technologies Co., Ltd. 2022-2022. All rights reserved.
+# Copyright (c) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
 
 set -e
 
