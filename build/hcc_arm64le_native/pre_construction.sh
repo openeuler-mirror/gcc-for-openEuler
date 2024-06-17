@@ -39,12 +39,12 @@ tar -xzf $ROOT_BUILD_DIR/open_source/cmake/$CMAKE.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/openssl/$OPENSSL.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/ncurses/$NCURSES.tar.gz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/llvm-mlir/$MLIR.tar.xz -C $ROOT_NATIVE_SRC
-tar -xzf $ROOT_BUILD_DIR/open_source/protobuf/protobuf-all-3.14.0.tar.gz -C $ROOT_NATIVE_SRC
+tar -xzf $ROOT_BUILD_DIR/open_source/protobuf/${PROTOBUF/-/-all-}.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/pin-gcc-client/$GCC_CLIENT.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/grpc/$GRPC.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/c-ares/$CARES.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/abseil-cpp/$ABSEIL.tar.gz -C $ROOT_NATIVE_SRC
-tar -xzf $ROOT_BUILD_DIR/open_source/re2/2021-11-01.tar.gz -C $ROOT_NATIVE_SRC
+tar -xzf $ROOT_BUILD_DIR/open_source/re2/${RE2#*-}.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/jsoncpp/$JSONCPP.tar.gz -C $ROOT_NATIVE_SRC
 
 apply_patch() {
@@ -53,9 +53,15 @@ apply_patch() {
     else
         cd $ROOT_NATIVE_SRC/$2
     fi
-    for file in $(grep -ne ^Patch[0-9]*:.*\.patch $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
-        patch --fuzz=0 -p1 <$ROOT_BUILD_DIR/open_source/$1/$file
-    done
+    if [ $1 = "binutils" ]; then
+        for file in $(grep -ne '^Patch[0-9]\{1,2\}:.*\.patch' $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
+            patch --fuzz=0 -p1 <$ROOT_BUILD_DIR/open_source/$1/$file
+        done
+    else
+        for file in $(grep -ne ^Patch[0-9]*:.*\.patch $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
+            patch --fuzz=0 -p1 <$ROOT_BUILD_DIR/open_source/$1/$file
+        done
+    fi
     cd -
 }
 

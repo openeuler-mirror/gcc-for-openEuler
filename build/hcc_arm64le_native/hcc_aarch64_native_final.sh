@@ -15,11 +15,8 @@ fi
 readonly ROOT_NATIVE_DIR="$PWD/arm64le_build_dir"
 readonly ROOT_NATIVE_SRC="$PWD/../../open_source/hcc_arm64le_native_build_src"
 readonly PREFIX_NATIVE="$PWD/arm64le_build_dir/$INSTALL_NATIVE"
-readonly PREFIX_GRPC="$PWD/arm64le_build_dir/grpc"
 readonly PREFIX_BOLT="$PWD/arm64le_build_dir/llvm-bolt"
-readonly PREFIX_PROTOBUF="$PWD/arm64le_build_dir/protobuf"
 readonly PREFIX_MLIR="$PWD/arm64le_build_dir/llvm-mlir"
-readonly PREFIX_JSONCPP="$PWD/arm64le_build_dir/jsoncpp"
 readonly OUTPUT="$PWD/../../output/$INSTALL_NATIVE"
 readonly PARALLEL=$(grep ^processor /proc/cpuinfo | wc -l)
 
@@ -30,10 +27,10 @@ declare -x CFLAGS_FOR_JEMALLOC="$SECURE_CFLAGS"
 
 export PATH=$PREFIX_NATIVE/bin:$PREFIX_BOLT/bin:$PATH
 export LD_LIBRARY_PATH=$PREFIX_NATIVE/lib:$PREFIX_NATIVE/lib64:$LD_LIBRARY_PATH
-export CPLUS_INCLUDE_PATH=$PREFIX_NATIVE/include:$PREFIX_PROTOBUF/include:$PREFIX_GRPC/include:$PREFIX_JSONCPP/include
+export CPLUS_INCLUDE_PATH=$PREFIX_NATIVE/include
 
 echo "Building pin_gcc_client..." && pushd "${ROOT_NATIVE_DIR}/obj/build-client"
-cmake -G"Unix Makefiles" $ROOT_NATIVE_SRC/$GCC_CLIENT -DLLVM_DIR=$PREFIX_MLIR/lib/cmake/llvm -DMLIR_DIR=$PREFIX_MLIR/lib/cmake/mlir -DCMAKE_NO_SYSTEM_FROM_IMPORTED=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$ROOT_NATIVE_DIR/obj/build-client -DCMAKE_PREFIX_PATH="$PREFIX_PROTOBUF;$PREFIX_GRPC;$PREFIX_JSONCPP"
+cmake -G"Unix Makefiles" $ROOT_NATIVE_SRC/$GCC_CLIENT -DLLVM_DIR=$PREFIX_MLIR/lib/cmake/llvm -DMLIR_DIR=$PREFIX_MLIR/lib/cmake/mlir -DCMAKE_NO_SYSTEM_FROM_IMPORTED=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$ROOT_NATIVE_DIR/obj/build-client -DCMAKE_PREFIX_PATH=$PREFIX_NATIVE -DCMAKE_C_FLAGS="${SECURE_CFLAGS}" -DCMAKE_CXX_FLAGS="${SECURE_CFLAGS}" -DCMAKE_SHRAED_LINKER_FLAGS="${SECURE_LDFLAGS}"
 make -j $PARALLEL && make install && popd
 cp $ROOT_NATIVE_DIR/obj/build-client/lib/libpin_gcc_client.so $PREFIX_NATIVE/lib64
 
