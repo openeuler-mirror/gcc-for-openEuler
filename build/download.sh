@@ -17,7 +17,6 @@ readonly MATHLIB_NAME="optimized-routines"
 readonly JEMALLOC_NAME="jemalloc"
 readonly AUTOFDO_NAME="autofdo"
 readonly BOLT_NAME="llvm-bolt"
-readonly CMAKE_NAME="cmake"
 readonly OPENSSL_NAME="openssl"
 readonly NCURSES_NAME="ncurses"
 readonly MLIR_NAME="llvm-mlir"
@@ -28,6 +27,7 @@ readonly CARES_NAME="c-ares"
 readonly ABSEIL_NAME="abseil-cpp"
 readonly RE2_NAME="re2"
 readonly JSONCPP_NAME="jsoncpp"
+readonly AI4C_NAME="AI4C"
 
 # Create the open source software directory.
 [ ! -d "$OPEN_SOURCE_PATH" ] && mkdir $OPEN_SOURCE_PATH
@@ -50,7 +50,6 @@ download $MATHLIB_NAME
 download $JEMALLOC_NAME
 download $AUTOFDO_NAME
 download $BOLT_NAME
-download $CMAKE_NAME
 download $OPENSSL_NAME
 download $NCURSES_NAME
 download $MLIR_NAME
@@ -61,6 +60,7 @@ download $CARES_NAME
 download $ABSEIL_NAME
 download $RE2_NAME
 download $JSONCPP_NAME
+download $AI4C_NAME
 
 popd
 echo "Download success!!!"

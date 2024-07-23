@@ -35,7 +35,6 @@ tar -xzf $ROOT_BUILD_DIR/open_source/optimized-routines/$MATHLIB.tar.gz -C $ROOT
 tar -xf $ROOT_BUILD_DIR/open_source/jemalloc/$JEMALLOC.tar.bz2 -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/autofdo/$AUTOFDO.tar.xz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/llvm-bolt/$BOLT.tar.xz -C $ROOT_NATIVE_SRC
-tar -xzf $ROOT_BUILD_DIR/open_source/cmake/$CMAKE.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/openssl/$OPENSSL.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/ncurses/$NCURSES.tar.gz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/llvm-mlir/$MLIR.tar.xz -C $ROOT_NATIVE_SRC
@@ -46,6 +45,7 @@ tar -xzf $ROOT_BUILD_DIR/open_source/c-ares/$CARES.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/abseil-cpp/$ABSEIL.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/re2/${RE2#*-}.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/jsoncpp/$JSONCPP.tar.gz -C $ROOT_NATIVE_SRC
+tar -xzf $ROOT_BUILD_DIR/open_source/AI4C/$AI4C.tar.gz -C $ROOT_NATIVE_SRC
 
 apply_patch() {
     if [ $1 = "isl" ]; then
@@ -75,13 +75,14 @@ apply_patch optimized-routines $MATHLIB
 apply_patch jemalloc $JEMALLOC
 apply_patch autofdo $AUTOFDO
 apply_patch llvm-bolt $BOLT
-apply_patch cmake $CMAKE
 apply_patch openssl $OPENSSL
 apply_patch ncurses $NCURSES
 apply_patch llvm-mlir $MLIR
 apply_patch protobuf $PROTOBUF
 apply_patch pin-gcc-client $GCC_CLIENT
 apply_patch grpc $GRPC
+apply_patch jsoncpp $JSONCPP
+apply_patch AI4C $AI4C
 apply_patch c-ares $CARES
 rm -rf $ROOT_NATIVE_SRC/$GRPC/third_party/cares/cares
 mv $ROOT_NATIVE_SRC/$CARES $ROOT_NATIVE_SRC/$GRPC/third_party/cares/cares
@@ -93,7 +94,5 @@ mv $ROOT_NATIVE_SRC/$ABSEIL $ROOT_NATIVE_SRC/$GRPC/third_party/abseil-cpp
 apply_patch re2 $RE2
 rm -rf $ROOT_NATIVE_SRC/$GRPC/third_party/re2
 mv $ROOT_NATIVE_SRC/$RE2 $ROOT_NATIVE_SRC/$GRPC/third_party/re2
-
-apply_patch jsoncpp $JSONCPP
 
 chmod 777 $ROOT_NATIVE_SRC -R
