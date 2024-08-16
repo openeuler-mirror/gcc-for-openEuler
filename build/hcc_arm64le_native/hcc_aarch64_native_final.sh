@@ -76,6 +76,7 @@ make -j $PARALLEL && make install -j $PARAELLEL && popd
 # Install aiframe required by AI4C.
 echo "Building aiframe for AI4C..." && pushd $ROOT_NATIVE_DIR/obj/build-AI4C/aiframe 
 cp -r $ROOT_NATIVE_SRC/$AI4C/aiframe/* ./
+cp -r $ROOT_NATIVE_SRC/$AI4C/models/* ../models
 cmake -DCMAKE_INSTALL_PREFIX=$PREFIX_NATIVE -Donnxruntime_ROOTDIR=$PREFIX_NATIVE -DCMAKE_BUILD_TYPE=RelWithDebInfo ./
 make -j $PARALLEL && make install -j $PARALLEL && popd
 
