@@ -34,6 +34,7 @@ export CXX=$PREFIX_NATIVE/bin/g++
 
 echo "Building pin_gcc_client..." && pushd "${ROOT_NATIVE_DIR}/obj/build-client"
 sed -i '/^find_package(PkgConfig REQUIRED)/,/^pkg_check_modules(PC_PROTOBUF "protobuf>=3.1.0")/ s/^/# /' $ROOT_NATIVE_SRC/$GCC_CLIENT/cmake/common.cmake
+sed -i '/#include <cstdarg>/a #include "unistd.h"' $ROOT_NATIVE_SRC/$GCC_CLIENT/lib/PluginClient/PluginLog.cpp
 cmake -G"Unix Makefiles" $ROOT_NATIVE_SRC/$GCC_CLIENT -DLLVM_DIR=$PREFIX_MLIR/lib/cmake/llvm -DMLIR_DIR=$PREFIX_MLIR/lib/cmake/mlir -DCMAKE_NO_SYSTEM_FROM_IMPORTED=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$ROOT_NATIVE_DIR/obj/build-client -DCMAKE_PREFIX_PATH=$PREFIX_NATIVE -DCMAKE_C_FLAGS="${SECURE_CFLAGS}" -DCMAKE_CXX_FLAGS="${SECURE_CFLAGS}" -DCMAKE_SHRAED_LINKER_FLAGS="${SECURE_LDFLAGS}"
 make -j $PARALLEL && make install -j $PARAELLEL && popd
 cp $ROOT_NATIVE_DIR/obj/build-client/lib64/libpin_gcc_client.so $PREFIX_NATIVE/lib64
@@ -59,6 +60,46 @@ sed -i "s@LIBDIR := \$(DESTDIR)${PREFIX_NATIVE}/lib@LIBDIR := \$(DESTDIR)${PREFI
 sed -i "s@EXTRA_CFLAGS :=@EXTRA_CFLAGS := -shared@" Makefile
 sed -i "s@EXTRA_CXXFLAGS :=@EXTRA_CXXFLAGS := -shared@" Makefile
 make -j $PARALLEL && make install -j $PARAELLEL && popd
+
+# Install yaml-cpp required by AI4C.
+echo "Building yaml-cpp for AI4C..." && pushd $ROOT_NATIVE_DIR/obj/build-yaml-cpp
+cp -rf $ROOT_NATIVE_SRC/$YAML_CPP/* .
+cmake  -DCMAKE_INSTALL_PREFIX=$PREFIX_NATIVE -DCMAKE_BUILD_TYPE=Release -DYAML_CPP_BUILD_TOOLS:BOOL=OFF -DYAML_CPP_FORMAT_SOURCE:BOOL=OFF -DYAML_CPP_INSTALL:BOOL=ON -DYAML_BUILD_SHARED_LIBS:BOOL=ON -DYAML_CPP_BUILD_TESTS:BOOL=OFF
+make -j $PARALLEL && make install -j $PARAELLEL && popd
+
+# Install onnxruntime required by AI4C. 
+echo "Building onnxruntime for AI4C..." && pushd $ROOT_NATIVE_DIR/obj/build-AI4C
+cp -r $ROOT_NATIVE_SRC/$AI4C/* . 
+cd ./third_party/onnxruntime
+cmake -DPython_EXECUTABLE=/usr/bin/python3.6 -DPython3_EXECUTABLE=/usr/bin/python3.6 -DCMAKE_INSTALL_PREFIX=$PREFIX_NATIVE  -DCMAKE_INSTALL_LIBDIR=$PREFIX_NATIVE/lib64 -DCMAKE_INSTALL_INCLUDEDIR=$PREFIX_NATIVE/include -Donnxruntime_BUILD_SHARED_LIB=ON -Donnxruntime_BUILD_UNIT_TESTS=OFF -Donnxruntime_INSTALL_UNIT_TESTS=OFF -Donnxruntime_BUILD_BENCHMARKS=OFF -Donnxruntime_USE_FULL_PROTOBUF=ON -Donnxruntime_DISABLE_ABSEIL=ON -DCMAKE_BUILD_TYPE=Release -S cmake
+make -j $PARALLEL && make install -j $PARAELLEL && popd
+mv $PREFIX_NATIVE/include/onnxruntime/* $PREFIX_NATIVE/include
+rm -rf $PREFIX_NATIVE/include/onnxruntime
+
+# Install aiframe required by AI4C.
+echo "Building aiframe for AI4C..." && pushd $ROOT_NATIVE_DIR/obj/build-AI4C
+cp ./models/* $PREFIX_NATIVE/lib64/AI4C
+cd ./python
+python3 setup.py bdist_wheel -Donnxruntime_ROOTDIR=$PREFIX_NATIVE -DCMAKE_BUILD_TYPE=RelWithDebInfo -Dcrypto_LIBDIR=$PREFIX_NATIVE/lib64
+cd ./dist
+cp *.whl $PREFIX_NATIVE/lib64/AI4C
+popd
+
+echo "Building opentuner..." && pushd $ROOT_NATIVE_SRC/$OPEN_TUNER
+sed -i '/cmdclass = {/,/},/ s/^/# /' setup.py
+python3 setup.py bdist_wheel
+cd ./dist
+cp *.whl $PREFIX_NATIVE/lib64/AI4C
+popd
+
+echo "Building autotuner..." && pushd $ROOT_NATIVE_SRC/$AUTO_TUNER
+sed -i '/cmdclass = {/,/},/ s/^/# /' setup.py
+python3 setup.py bdist_wheel
+cd ./dist
+cp *.whl $PREFIX_NATIVE/lib64/AI4C
+popd
+
+cp $PWD/install_ai4c.sh $PREFIX_NATIVE/bin
 
 find $PREFIX_NATIVE -name "*.la" -exec rm -f {} \;
 

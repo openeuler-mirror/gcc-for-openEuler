@@ -36,6 +36,8 @@ tar -xf $ROOT_BUILD_DIR/open_source/jemalloc/$JEMALLOC.tar.bz2 -C $ROOT_NATIVE_S
 tar -xf $ROOT_BUILD_DIR/open_source/autofdo/$AUTOFDO.tar.xz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/llvm-bolt/$BOLT.tar.xz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/cmake/$CMAKE.tar.gz -C $ROOT_NATIVE_SRC
+tar -xzf $ROOT_BUILD_DIR/open_source/AI4C/$AI4C.tar.gz -C $ROOT_NATIVE_SRC
+tar -xzf $ROOT_BUILD_DIR/open_source/yaml-cpp/$YAML_CPP.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/openssl/$OPENSSL.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/ncurses/$NCURSES.tar.gz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/llvm/$LLVM_CMAKE.tar.xz -C $ROOT_NATIVE_SRC
@@ -50,6 +52,8 @@ tar -xzf $ROOT_BUILD_DIR/open_source/re2/${RE2#*-}.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/jsoncpp/$JSONCPP.tar.gz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/perl/$PERL.tar.xz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/perl-IPC-Cmd/$PERL_IPC_CMD.tar.gz -C $ROOT_NATIVE_SRC
+unzip $ROOT_BUILD_DIR/open_source/BiSheng-opentuner/bisheng-opentuner.zip -d $ROOT_NATIVE_SRC
+unzip $ROOT_BUILD_DIR/open_source/BiSheng-Autotuner/BiSheng-Autotuner.zip -d $ROOT_NATIVE_SRC
 
 apply_patch() {
     echo "applying patch for $1......"
@@ -62,12 +66,20 @@ apply_patch() {
         for file in $(grep -ne '^Patch[0-9]\{1,2\}:.*\.patch' $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
             patch --fuzz=0 -p1 <$ROOT_BUILD_DIR/open_source/$1/$file
         done
+    elif [ $1 = "gcc" ]; then
+	for file in $(grep -ne '^Patch[0-9]\{1,3\}:.*\.patch' $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
+            patch --fuzz=0 -p1 <$ROOT_BUILD_DIR/open_source/$1/$file
+        done
+    elif [ $1 = "AI4C" ]; then
+        for file in $(grep -ne '^Patch[0-9]*:.*\.patch' $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
+	    git apply -p1 < $ROOT_BUILD_DIR/open_source/$1/$file
+        done
     elif [ $1 = "cmake" ]; then
         for file in $(grep -ne '^Patch[02]:.*\.patch' $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
             patch --fuzz=0 -p1 <$ROOT_BUILD_DIR/open_source/$1/$file
         done
     else
-        for file in $(grep -ne ^Patch[0-9]*:.*\.patch $ROOT_BUILD_DIR/open_source/$1/$1.spec | awk '{print $2}'); do
+        for file in $(grep -ne ^Patch[0-9]*:.*\.patch $ROOT_BUILD_DIR/open_source/$1/*.spec | awk '{print $2}'); do
             patch --fuzz=0 -p1 <$ROOT_BUILD_DIR/open_source/$1/$file
         done
     fi
@@ -85,6 +97,9 @@ apply_patch jemalloc $JEMALLOC
 apply_patch autofdo $AUTOFDO
 apply_patch llvm-bolt $BOLT
 apply_patch cmake $CMAKE
+apply_patch AI4C $AI4C
+mv $ROOT_NATIVE_SRC/yaml-cpp-$YAML_CPP $ROOT_NATIVE_SRC/$YAML_CPP
+apply_patch yaml-cpp $YAML_CPP
 apply_patch openssl $OPENSSL
 apply_patch ncurses $NCURSES
 mv $ROOT_NATIVE_SRC/$LLVM_CMAKE $ROOT_NATIVE_SRC/cmake
@@ -108,5 +123,7 @@ mv $ROOT_NATIVE_SRC/$RE2 $ROOT_NATIVE_SRC/$GRPC/third_party/re2
 
 # skip perl patch
 apply_patch perl-IPC-Cmd $PERL_IPC_CMD
+apply_patch BiSheng-opentuner $OPEN_TUNER
+apply_patch BiSheng-Autotuner $AUTO_TUNER
 
 chmod 777 $ROOT_NATIVE_SRC -R
