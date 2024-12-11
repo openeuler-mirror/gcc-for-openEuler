@@ -19,6 +19,8 @@ readonly JEMALLOC_NAME="jemalloc"
 readonly AUTOFDO_NAME="autofdo"
 readonly BOLT_NAME="llvm-bolt"
 readonly CMAKE_NAME="cmake"
+readonly AI4C_NAME="AI4C"
+readonly YAML_CPP_NAME="yaml-cpp"
 readonly OPENSSL_NAME="openssl"
 readonly NCURSES_NAME="ncurses"
 readonly LLVM_NAME="llvm"
@@ -32,6 +34,8 @@ readonly RE2_NAME="re2"
 readonly JSONCPP_NAME="jsoncpp"
 readonly PERL_NAME="perl"
 readonly PERL_IPC_CMD_NAME="perl-IPC-Cmd"
+readonly OPEN_TUNER="BiSheng-opentuner"
+readonly AUTO_TUNER="BiSheng-Autotuner"
 
 # Create the open source software directory.
 [ ! -d "$OPEN_SOURCE_PATH" ] && mkdir $OPEN_SOURCE_PATH
@@ -56,6 +60,8 @@ download $JEMALLOC_NAME
 download $AUTOFDO_NAME
 download $BOLT_NAME
 download $CMAKE_NAME
+download $AI4C_NAME
+download $YAML_CPP_NAME
 download $OPENSSL_NAME
 download $NCURSES_NAME
 download $LLVM_NAME
@@ -69,6 +75,8 @@ download $RE2_NAME
 download $JSONCPP_NAME
 download $PERL_NAME
 download $PERL_IPC_CMD_NAME
+download $OPEN_TUNER
+download $AUTO_TUNER
 
 popd
 echo "Download success!!!"

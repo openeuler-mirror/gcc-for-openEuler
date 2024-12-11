@@ -15,6 +15,7 @@ fi
 readonly ROOT_NATIVE_DIR="$PWD/arm64le_build_dir"
 readonly ROOT_NATIVE_SRC="$PWD/../../open_source/hcc_arm64le_native_build_src"
 readonly PREFIX_NATIVE="$PWD/arm64le_build_dir/$INSTALL_NATIVE"
+readonly PREFIX_TEXINFO="$PWD/arm64le_build_dir/texinfo"
 readonly PREFIX_BOLT="$PWD/arm64le_build_dir/llvm-bolt"
 readonly PREFIX_OPENSSL="$PWD/arm64le_build_dir/openssl"
 readonly PREFIX_MLIR="$PWD/arm64le_build_dir/llvm-mlir"
@@ -38,7 +39,7 @@ create_directory() {
     done
 }
 
-create_directory $ROOT_NATIVE_DIR/obj $PREFIX_NATIVE $PREFIX_TEXINFO $PREFIX_BOLT $PREFIX_OPENSSL $PREFIX_MLIR $PREFIX_PERL $OUTPUT $ROOT_NATIVE_DIR/obj/build-gmp $ROOT_NATIVE_DIR/obj/build-mpfr $ROOT_NATIVE_DIR/obj/build-isl $ROOT_NATIVE_DIR/obj/build-texinfo $ROOT_NATIVE_DIR/obj/build-mpc $ROOT_NATIVE_DIR/obj/build-binutils $ROOT_NATIVE_DIR/obj/build-gcc-final $ROOT_NATIVE_DIR/obj/build-mathlib $ROOT_NATIVE_DIR/obj/build-jemalloc $ROOT_NATIVE_DIR/obj/build-autofdo $ROOT_NATIVE_DIR/obj/build-llvm-bolt $ROOT_NATIVE_DIR/obj/build-openssl $ROOT_NATIVE_DIR/obj/build-llvm-mlir $ROOT_NATIVE_DIR/obj/build-jsoncpp $ROOT_NATIVE_DIR/obj/build-grpc $ROOT_NATIVE_DIR/obj/build-protobuf $ROOT_NATIVE_DIR/obj/build-client $ROOT_NATIVE_DIR/obj/build-protobuf $ROOT_NATIVE_DIR/obj/build-ncurses $ROOT_NATIVE_DIR/obj/build-IPC-Cmd $ROOT_NATIVE_DIR/obj/build-cmake
+create_directory $ROOT_NATIVE_DIR/obj $PREFIX_NATIVE $PREFIX_NATIVE/lib64/AI4C $PREFIX_TEXINFO $PREFIX_BOLT $PREFIX_OPENSSL $PREFIX_MLIR $PREFIX_PERL $OUTPUT $ROOT_NATIVE_DIR/obj/build-gmp $ROOT_NATIVE_DIR/obj/build-mpfr $ROOT_NATIVE_DIR/obj/build-isl $ROOT_NATIVE_DIR/obj/build-texinfo $ROOT_NATIVE_DIR/obj/build-mpc $ROOT_NATIVE_DIR/obj/build-binutils $ROOT_NATIVE_DIR/obj/build-gcc-final $ROOT_NATIVE_DIR/obj/build-mathlib $ROOT_NATIVE_DIR/obj/build-jemalloc $ROOT_NATIVE_DIR/obj/build-autofdo $ROOT_NATIVE_DIR/obj/build-llvm-bolt $ROOT_NATIVE_DIR/obj/build-openssl $ROOT_NATIVE_DIR/obj/build-llvm-mlir $ROOT_NATIVE_DIR/obj/build-jsoncpp $ROOT_NATIVE_DIR/obj/build-grpc $ROOT_NATIVE_DIR/obj/build-protobuf $ROOT_NATIVE_DIR/obj/build-client $ROOT_NATIVE_DIR/obj/build-protobuf $ROOT_NATIVE_DIR/obj/build-ncurses $ROOT_NATIVE_DIR/obj/build-IPC-Cmd $ROOT_NATIVE_DIR/obj/build-cmake $ROOT_NATIVE_DIR/obj/build-yaml-cpp $ROOT_NATIVE_DIR/obj/build-AI4C
 
 echo "Building gmp..." && pushd $ROOT_NATIVE_DIR/obj/build-gmp
 LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" $ROOT_NATIVE_SRC/$GMP/configure --prefix=$PREFIX_NATIVE --disable-shared --enable-cxx --build=$BUILD --host=$HOST
@@ -73,9 +74,10 @@ export PATH=$PREFIX_PERL/bin:$PATH
 echo "Building ncurses..." && pushd $ROOT_NATIVE_DIR/obj/build-ncurses
 LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" $ROOT_NATIVE_SRC/$NCURSES/configure --prefix=$PREFIX_NATIVE --with-shared --build=$BUILD --host=$HOST --libdir=$PREFIX_NATIVE/lib64
 make -j $PARALLEL && make install -j $PARALLEL && popd
-ln -s $PREFIX_NATIVE/lib64/libncurses.so $PREFIX_NATIVE/lib64/libtinfo.so
-ln -s $PREFIX_NATIVE/lib64/libncurses.so.6 $PREFIX_NATIVE/lib64/libtinfo.so.6
-ln -s $PREFIX_NATIVE/lib64/libncurses.so.6.3 $PREFIX_NATIVE/lib64/libtinfo.so.6.3
+pushd $PREFIX_NATIVE/lib64
+ln -s libncurses.so libtinfo.so
+ln -s libncurses.so.6 libtinfo.so.6
+ln -s libncurses.so.6.3 libtinfo.so.6.3
 
 echo "Building binutils..." && pushd $ROOT_NATIVE_DIR/obj/build-binutils
 LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" CFLAGS_FOR_TARGET="${SECURE_CFLAGS}" CXXFLAGS_FOR_TARGET="${SECURE_CFLAGS}" $ROOT_NATIVE_SRC/$BINUTILS/configure --prefix=$PREFIX_NATIVE --with-pkgversion="${COMPILER_INFO}" --enable-plugins --enable-ld=yes --libdir=$PREFIX_NATIVE/lib64 --enable-multiarch --build=$BUILD --host=$HOST --target=$TARGET
@@ -88,16 +90,18 @@ make pure_install DESTDIR=$PREFIX_PERL && make install -j $PARALLEL && popd
 # Temporarily install OpenSSL to provide fixed libcrypto.so version for various OSes.
 echo "Building openssl for autofdo..." && pushd $ROOT_NATIVE_DIR/obj/build-openssl
 cp -rf $ROOT_NATIVE_SRC/$OPENSSL/* .
-LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" ./Configure --prefix=$PREFIX_OPENSSL --openssldir=$PREFIX_OPENSSL enable-ec_nistp_64_gcc_128 zlib enable-camellia enable-seed enable-rfc3779 enable-sctp enable-cms enable-md2 enable-rc5 enable-ssl3 enable-ssl3-method enable-weak-ssl-ciphers no-mdc2 no-ec2m enable-sm2 enable-sm3 enable-sm4 shared linux-aarch64 -Wa,--noexecstack -DPURIFY '-DDEVRANDOM="\"/dev/urandom\""'
+LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" ./Configure --prefix=$PREFIX_OPENSSL --openssldir=$PREFIX_OPENSSL enable-ec_nistp_64_gcc_128 zlib enable-camellia enable-seed enable-rfc3779 enable-cms enable-md2 enable-rc5 no-mdc2 no-ec2m enable-sm2 enable-sm4 shared linux-aarch64 -Wa,--noexecstack -DPURIFY '-DDEVRANDOM="\"/dev/urandom\""'
 make -j $PARALLEL && make install -j $PARALLEL && popd
-
 export OPENSSL_ROOT_DIR=$PREFIX_OPENSSL
 export PATH=$PREFIX_OPENSSL/bin:$PATH
-export CPLUS_INCLUDE_PATH=$PREFIX_OPENSSL/include
 export LIBRARY_PATH=$PREFIX_OPENSSL/lib64
 export LD_LIBRARY_PATH=$PREFIX_OPENSSL/lib64
-cp -r $PREFIX_OPENSSL/include $PREFIX_NATIVE/include
+cp -r $PREFIX_OPENSSL/include/* $PREFIX_NATIVE/include
 cp $PREFIX_OPENSSL/lib64/libssl.so.* $PREFIX_NATIVE/lib64
+cp $PREFIX_OPENSSL/lib64/libcrypto.so.* $PREFIX_NATIVE/lib64
+pushd $PREFIX_NATIVE/lib64
+ln -s libcrypto.so.3 libcrypto.so # AI4C
+popd  
 
 echo "Building cmake for bolt..." && pushd $ROOT_NATIVE_DIR/obj/build-cmake
 LDFLAGS="${SECURE_LDFLAGS}" CFLAGS="${SECURE_CFLAGS}" CXXFLAGS="${SECURE_CFLAGS}" $ROOT_NATIVE_SRC/$CMAKE/configure --prefix=$PREFIX_BOLT
@@ -111,15 +115,19 @@ cmake $ROOT_NATIVE_SRC/$PROTOBUF -Dprotobuf_ABSL_PROVIDER=module -Dprotobuf_BUIL
 make -j $PARALLEL && make install -j $PARALLEL && popd
 
 export PATH=$PREFIX_NATIVE/bin:$PATH
+export CPLUS_INCLUDE_PATH=$PREFIX_NATIVE/include
 export LD_LIBRARY_PATH=$PREFIX_NATIVE/lib64:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$PREFIX_NATIVE/lib64/pkgconfig
 
 echo "Building autofdo..." && pushd $ROOT_NATIVE_DIR/obj/build-autofdo
 cmake -G"Unix Makefiles" $ROOT_NATIVE_SRC/$AUTOFDO -DCMAKE_INSTALL_PREFIX=$PREFIX_NATIVE -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_TOOL=GCOV -DCMAKE_LIBRARY_PATH=$PREFIX_OPENSSL/lib64
 make -j $PARALLEL && make install -j $PARALLEL && popd
+cp $ROOT_NATIVE_DIR/obj/build-autofdo/create_gcov $PREFIX_NATIVE/bin
+cp $ROOT_NATIVE_DIR/obj/build-autofdo/dump_gcov $PREFIX_NATIVE/bin
+cp $ROOT_NATIVE_DIR/obj/build-autofdo/profile_merger $PREFIX_NATIVE/bin
 
 echo "Building bolt..." && pushd $ROOT_NATIVE_DIR/obj/build-llvm-bolt
-cmake -G"Unix Makefiles" $ROOT_NATIVE_SRC/$BOLT/llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=ON -DLLVM_ENABLE_PROJECTS="bolt" -DLLVM_TARGETS_TO_BUILD="AArch64" -DCMAKE_INSTALL_PREFIX=$PREFIX_BOLT -DBUILD_SHARED_LIBS:BOOL=ON
+cmake -G"Unix Makefiles" $ROOT_NATIVE_SRC/$BOLT/llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=ON -DLLVM_ENABLE_PROJECTS="bolt" -DLLVM_TARGETS_TO_BUILD="AArch64" -DCMAKE_INSTALL_PREFIX=$PREFIX_BOLT -DBUILD_SHARED_LIBS:BOOL=OFF
 make -j $PARALLEL && make install -j $PARALLEL && popd
 # Put in llvm-bolt and perf2bolt.
 cp $PREFIX_BOLT/bin/llvm-bolt $PREFIX_BOLT/bin/perf2bolt $PREFIX_NATIVE/bin
@@ -134,7 +142,11 @@ cp $ROOT_NATIVE_DIR/obj/build-llvm-mlir/bin/mlir-tblgen /usr/bin
 cp -r $PREFIX_MLIR/lib/* $PREFIX_NATIVE/lib64
 cp -r $PREFIX_MLIR/include/* $PREFIX_NATIVE/include
 
-echo "Building grpc..." && pushd $ROOT_NATIVE_DIR/obj/build-grpc
+echo "Building grpc..." && pushd $ROOT_NATIVE_SRC/$GRPC
+# avoid downloading
+mkdir  $ROOT_NATIVE_SRC/$GRPC/third_party/opencensus-proto/src
+sed -r -i 's/(std=c\+\+)14/\1%{cpp_std}/g' setup.py grpc.gyp Rakefile examples/cpp/*/Makefile examples/cpp/*/CMakeLists.txt tools/run_tests/artifacts/artifact_targets.py tools/distrib/python/grpcio_tools/setup.py && popd
+pushd $ROOT_NATIVE_DIR/obj/build-grpc
 cmake -G "Unix Makefiles" $ROOT_NATIVE_SRC/$GRPC -DCMAKE_BUILD_TYPE=Release -DgRPC_INSTALL=ON -DgRPC_CARES_PROVIDER=module -DgRPC_PROTOBUF_PROVIDER=package -DgRPC_SSL_PROVIDER=package -DgRPC_RE2_PROVIDER=module -DgRPC_ABSL_PROVIDER=package -DCMAKE_INSTALL_PREFIX=$PREFIX_NATIVE -DgRPC_INSTALL_LIBDIR=$PREFIX_NATIVE/lib64 -DProtobuf_INCLUDE_DIR=$PREFIX_NATIVE/include -DProtobuf_LIBRARY=$PREFIX_NATIVE/lib64/libprotobuf.so -DProtobuf_PROTOC_LIBRARY=$PREFIX_NATIVE/lib64/libprotoc.so -DProtobuf_PROTOC_EXECUTABLE=$PREFIX_NATIVE/bin/protoc -DBUILD_DEPS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="${SECURE_CFLAGS}" -DCMAKE_CXX_FLAGS="${SECURE_CFLAGS}" -DCMAKE_SHRAED_LINKER_FLAGS="${SECURE_LDFLAGS}"
 make -j $PARALLEL && make install -j $PARALLEL && popd
 
