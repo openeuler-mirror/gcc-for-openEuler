@@ -40,6 +40,8 @@ readonly AUTO_TUNER="BiSheng-Autotuner"
 # Create the open source software directory.
 [ ! -d "$OPEN_SOURCE_PATH" ] && mkdir $OPEN_SOURCE_PATH
 
+pip3 install $PWD/*.whl
+
 download() {
     [ -d "$1" ] && rm -rf $1
     echo "Download $1." && git clone -b $BRANCH https://gitee.com/src-openeuler/$1.git --depth=1
