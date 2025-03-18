@@ -48,7 +48,7 @@ tar -xzf $ROOT_BUILD_DIR/open_source/pin-gcc-client/$GCC_CLIENT.tar.gz -C $ROOT_
 tar -xzf $ROOT_BUILD_DIR/open_source/grpc/$GRPC.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/c-ares/$CARES.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/abseil-cpp/$ABSEIL.tar.gz -C $ROOT_NATIVE_SRC
-tar -xzf $ROOT_BUILD_DIR/open_source/re2/${RE2#*-}.tar.gz -C $ROOT_NATIVE_SRC
+tar -xzf $ROOT_BUILD_DIR/open_source/re2/$RE2.tar.gz -C $ROOT_NATIVE_SRC
 tar -xzf $ROOT_BUILD_DIR/open_source/jsoncpp/$JSONCPP.tar.gz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/perl/$PERL.tar.xz -C $ROOT_NATIVE_SRC
 tar -xf $ROOT_BUILD_DIR/open_source/perl-IPC-Cmd/$PERL_IPC_CMD.tar.gz -C $ROOT_NATIVE_SRC
@@ -95,10 +95,10 @@ apply_patch isl $ISL
 apply_patch optimized-routines $MATHLIB
 apply_patch jemalloc $JEMALLOC
 apply_patch autofdo $AUTOFDO
+tar -xf $ROOT_BUILD_DIR/open_source/autofdo/abseil.tar.xz -C $ROOT_NATIVE_SRC/$AUTOFDO/third_party
 apply_patch llvm-bolt $BOLT
 apply_patch cmake $CMAKE
 apply_patch AI4C $AI4C
-mv $ROOT_NATIVE_SRC/yaml-cpp-$YAML_CPP $ROOT_NATIVE_SRC/$YAML_CPP
 apply_patch yaml-cpp $YAML_CPP
 apply_patch openssl $OPENSSL
 apply_patch ncurses $NCURSES
